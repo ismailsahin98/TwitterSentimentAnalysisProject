@@ -73,7 +73,7 @@ positive = df.sort_values(by=["tPolarity"],ascending=False)[["tweet","cleanedTwe
 positive.to_excel("positiveSorting.xlsx")
 
 
-#Sorting Negative Tweets
+#Sorting Negative Tweets first
 negative = df.sort_values(by=["tPolarity"],ascending=True)[["tweet","cleanedTweets","tPolarity","tSegmentation","tSubjectivity"]]
 negative.to_excel("negativeSorting.xlsx")
 
@@ -96,76 +96,9 @@ plt.show(block = True)
 
 consolidated_tweets = "".join(word for word in df["cleanedTweets"])
 
-
 wordcloud = WordCloud(background_color="black",width=1900, height=1000,).generate(consolidated_tweets)
 fig = plt.figure(figsize=(19,10), dpi=10000)
 plt.imshow(wordcloud, interpolation = "bilinear")
 plt.axis("off")
 wordcloud.to_image().show()
 wordcloud.to_file("wordcloud.png")
-
-
-
-
-
-
-
-
-
-#Polarity & Subjectivity Detection and Analysis
-
-from textblob import TextBlob
-import matplotlib.pyplot as plt
-
-def calculatePolarity(tweet):
-    return TextBlob(tweet).sentiment.polarity
-
-def calculateSubjectivity(tweet):
-    return TextBlob(tweet).sentiment.subjectivity
-
-def segmentation(tweet):
-    if tweet > 0:
-        return "Positive"
-    if tweet < 0:
-        return "Negative"
-    else:
-        return "Neutral"
-
-df["tPolarity"] = df["cleanedTweets"].apply(calculatePolarity) 
-df["tSegmentation"] = df ["tPolarity"].apply(segmentation)
-df["tSubjectivity"] = df["cleanedTweets"].apply(calculateSubjectivity)
-
-
-print(df.pivot_table(index = ['tSegmentation'],aggfunc={'tSegmentation':'count'}))
-
-#Sorting Positive Tweets first
-positive = df.sort_values(by=["tPolarity"],ascending=False)[["tweets","cleanedTweets","tPolarity","tSegmentation","tSubjectivity"]]
-positive.to_excel("positiveSorting.xlsx")
-
-
-#Sorting Negative Tweets
-negative = df.sort_values(by=["tPolarity"],ascending=True)[["tweets","cleanedTweets","tPolarity","tSegmentation","tSubjectivity"]]
-negative.to_excel("negativeSorting.xlsx")
-
-#Visualization
-from wordcloud import WordCloud
-import seaborn as sns
-
-sns.countplot(data = df, x='tSegmentation')
-plt.show(block=True)
-
-sns.set_style("whitegrid")
-sns.scatterplot(data = df, x = 'tPolarity', y = 'tSubjectivity', s = 75, hue = 'tSegmentation')
-plt.show(block=True)
-
-consolidated_tweets = "".join(word for word in df["cleanedTweets"])
-
-
-wordcloud = WordCloud(background_color="black",width=1900, height=1000,).generate(consolidated_tweets)
-fig = plt.figure(figsize=(10,10), dpi=10000)
-plt.imshow(wordcloud, interpolation = "bilinear")
-plt.axis("off")
-plt.show(block = True)
-
-
-
